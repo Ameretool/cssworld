@@ -1,0 +1,768 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>CSS.World · 三模式导航 | 明亮/暗黑/跟随系统</title>
+    <meta name="description" content="全球CSS资源导航 - 支持明亮、暗黑、跟随系统三种主题，中英双语，移动响应式设计。">
+    <!-- 字体与图标库 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* 基础主题变量 - 明亮模式 (默认) */
+        :root {
+            --bg-gradient-start: #f8faff;
+            --bg-gradient-end: #eef2fd;
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --card-border: rgba(0, 0, 0, 0.06);
+            --card-shadow: 0 12px 28px -8px rgba(0, 0, 0, 0.08);
+            --text-primary: #1A2C3E;
+            --text-secondary: #2c3e50;
+            --text-muted: #5a6e85;
+            --accent: #2563eb;
+            --accent-glow: rgba(37, 99, 235, 0.2);
+            --header-bg: rgba(255, 255, 255, 0.75);
+            --border-light: #e2e8f0;
+            --hero-bg: linear-gradient(135deg, #f1f5f9 0%, #e6edf8 100%);
+            --footer-bg: rgba(248, 250, 252, 0.7);
+            --badge-bg: #eef2ff;
+            --badge-text: #1e40af;
+            --btn-secondary-bg: rgba(0,0,0,0.05);
+            --theme-selector-bg: rgba(0,0,0,0.03);
+            --nav-link-color: #334155;
+            --nav-link-hover: #1e40af;
+        }
+
+        /* 暗黑模式类 (手动或跟随系统时通过js添加dark类) */
+        body.dark {
+            --bg-gradient-start: #0a0e1a;
+            --bg-gradient-end: #03050c;
+            --card-bg: rgba(18, 25, 45, 0.85);
+            --card-border: rgba(72, 187, 255, 0.12);
+            --card-shadow: 0 20px 32px -12px rgba(0, 0, 0, 0.5);
+            --text-primary: #F0F3FA;
+            --text-secondary: #CCD9F0;
+            --text-muted: #8fa0bc;
+            --accent: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.25);
+            --header-bg: rgba(10, 16, 30, 0.8);
+            --border-light: #1f2a3e;
+            --hero-bg: linear-gradient(145deg, #101624, #080c18);
+            --footer-bg: rgba(8, 12, 24, 0.7);
+            --badge-bg: #1e293b;
+            --badge-text: #94a3f8;
+            --btn-secondary-bg: rgba(255,255,255,0.08);
+            --theme-selector-bg: #1e293b;
+            --nav-link-color: #cbd5e1;
+            --nav-link-hover: #60a5fa;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: radial-gradient(ellipse at 20% 30%, var(--bg-gradient-start), var(--bg-gradient-end));
+            color: var(--text-primary);
+            line-height: 1.5;
+            min-height: 100vh;
+            transition: background 0.2s ease, color 0.2s;
+        }
+
+        .app-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 1.5rem 1.8rem 3rem;
+        }
+
+        /* 导航栏 - 重构结构：左侧品牌+菜单，右侧控制区 */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            background: var(--header-bg);
+            backdrop-filter: blur(12px);
+            border-radius: 3rem;
+            padding: 0.6rem 1.8rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--card-border);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+        }
+
+        /* 左侧区域: 品牌 + 导航菜单 */
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            font-weight: 700;
+            font-size: 1.6rem;
+            letter-spacing: -0.3px;
+        }
+
+        .brand-icon {
+            font-size: 2rem;
+            color: var(--accent);
+            filter: drop-shadow(0 2px 4px var(--accent-glow));
+        }
+
+        .brand-name {
+            background: linear-gradient(135deg, #2563eb, #38bdf8);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+
+        .brand-badge {
+            font-size: 0.7rem;
+            background: var(--badge-bg);
+            color: var(--badge-text);
+            padding: 0.2rem 0.7rem;
+            border-radius: 30px;
+            font-weight: 600;
+        }
+
+        /* 导航菜单列表 */
+        .nav-menu {
+            list-style: none;
+            display: flex;
+            gap: 1.5rem;
+            margin: 0;
+            padding: 0;
+        }
+        .nav-menu li a {
+            text-decoration: none;
+            font-weight: 500;
+            color: var(--nav-link-color);
+            transition: color 0.2s;
+            font-size: 1rem;
+        }
+        .nav-menu li a:hover {
+            color: var(--nav-link-hover);
+        }
+
+        /* 右侧控制区：主题选择器 + 语言切换 */
+        .controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .theme-selector {
+            display: flex;
+            gap: 0.4rem;
+            background: var(--theme-selector-bg);
+            padding: 0.3rem;
+            border-radius: 3rem;
+            backdrop-filter: blur(4px);
+            border: 1px solid var(--card-border);
+        }
+
+        .theme-btn {
+            background: transparent;
+            border: none;
+            padding: 0.45rem 0.9rem;
+            border-radius: 2rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-secondary);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .theme-btn i {
+            font-size: 0.8rem;
+        }
+
+        .theme-btn.active {
+            background: var(--accent);
+            color: white;
+            box-shadow: 0 2px 8px var(--accent-glow);
+        }
+
+        .theme-btn:hover:not(.active) {
+            background: var(--btn-secondary-bg);
+        }
+
+        .lang-toggle {
+            background: transparent;
+            border: 1px solid var(--card-border);
+            padding: 0.45rem 1rem;
+            border-radius: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+            font-size: 0.85rem;
+        }
+
+        .lang-toggle:hover {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        /* Hero */
+        .hero {
+            text-align: center;
+            padding: 2.5rem 1rem 2rem;
+            background: var(--hero-bg);
+            border-radius: 2.5rem;
+            margin-bottom: 2.5rem;
+            border: 1px solid var(--card-border);
+        }
+
+        .hero h1 {
+            font-size: clamp(2rem, 8vw, 3.8rem);
+            font-weight: 800;
+            background: linear-gradient(to right, var(--accent), #60a5fa);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+
+        .hero-sub {
+            font-size: 1.1rem;
+            max-width: 580px;
+            margin: 1rem auto 0;
+            color: var(--text-muted);
+        }
+
+        .hero-meta {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1.8rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            flex-wrap: wrap;
+        }
+
+        .hero-meta i {
+            margin-right: 0.3rem;
+            color: var(--accent);
+        }
+
+        /* 卡片网格 */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.8rem;
+            margin: 2rem 0 3rem;
+        }
+
+        .resource-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(8px);
+            border-radius: 1.8rem;
+            padding: 1.6rem;
+            border: 1px solid var(--card-border);
+            transition: all 0.25s ease;
+            display: flex;
+            flex-direction: column;
+            box-shadow: var(--card-shadow);
+        }
+
+        .resource-card:hover {
+            transform: translateY(-6px);
+            border-color: var(--accent);
+            box-shadow: 0 24px 36px -12px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-icon {
+            font-size: 2.4rem;
+            margin-bottom: 1rem;
+            color: var(--accent);
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.65rem;
+        }
+
+        .card-desc {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+            flex: 1;
+        }
+
+        .card-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-weight: 600;
+            text-decoration: none;
+            color: var(--accent);
+            border-top: 1px solid var(--border-light);
+            padding-top: 1rem;
+            margin-top: 0.2rem;
+            transition: gap 0.2s;
+            width: fit-content;
+        }
+
+        .card-link:hover {
+            gap: 0.9rem;
+        }
+
+        /* 页脚 */
+        .footer {
+            margin-top: 2rem;
+            padding: 1.5rem 0 0.5rem;
+            border-top: 1px solid var(--border-light);
+            background: var(--footer-bg);
+            border-radius: 2rem;
+            text-align: center;
+            backdrop-filter: blur(8px);
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            padding: 0 1rem;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .footer-links a, .theme-badge a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.85rem;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent);
+        }
+
+        .theme-badge {
+            margin-top: 1rem;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            background: var(--card-bg);
+            display: inline-block;
+            padding: 0.3rem 1rem;
+            border-radius: 2rem;
+            backdrop-filter: blur(4px);
+        }
+
+        @media (max-width: 860px) {
+            .navbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .nav-left {
+                justify-content: space-between;
+                width: 100%;
+            }
+            .controls {
+                justify-content: flex-end;
+            }
+        }
+
+        @media (max-width: 680px) {
+            .app-container {
+                padding: 1rem 1rem 2rem;
+            }
+            .nav-left {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.8rem;
+            }
+            .nav-menu {
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+            .controls {
+                justify-content: flex-start;
+                margin-top: 0.5rem;
+            }
+            .cards-grid {
+                gap: 1.2rem;
+            }
+            .hero {
+                padding: 1.8rem 1rem;
+            }
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+
+        /* Toast */
+        .toast-msg {
+            position: fixed;
+            bottom: 25px;
+            left: 50%;
+            transform: translateX(-50%) scale(0.95);
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--accent);
+            padding: 0.7rem 1.5rem;
+            border-radius: 40px;
+            color: var(--text-primary);
+            font-size: 0.85rem;
+            font-weight: 500;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+            z-index: 1000;
+            white-space: nowrap;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.1);
+        }
+        .toast-msg.show {
+            opacity: 1;
+            transform: translateX(-50%) scale(1);
+        }
+        @media (max-width: 480px) {
+            .toast-msg { white-space: normal; max-width: 85%; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 重构后的导航栏 -->
+        <div class="navbar">
+            <div class="nav-left">
+                <div class="nav-brand">
+                    <i class="fab fa-css3-alt brand-icon"></i>
+                    <span class="brand-name" data-i18n="brand">CSS.WORLD</span>
+                    <span class="brand-badge">+ nav</span>
+                </div>
+                <!-- 新增的导航菜单，预留扩展位置 -->
+                <ul class="nav-menu">
+                    <li><a href="#" data-i18n="nav_home">Home</a></li>
+                    <!-- 预留后续页面，举例注释：其他页面可以在此添加 -->
+                    <!-- <li><a href="#" data-i18n="nav_guides">Guides</a></li> -->
+                </ul>
+            </div>
+            <div class="controls">
+                <!-- 主题选择器放在右侧 controls 内，实现右移 -->
+                <div class="theme-selector" id="themeSelector">
+                    <button class="theme-btn" data-theme="light" id="themeLight"><i class="fas fa-sun"></i> <span data-i18n="light_mode">Light</span></button>
+                    <button class="theme-btn" data-theme="dark" id="themeDark"><i class="fas fa-moon"></i> <span data-i18n="dark_mode">Dark</span></button>
+                    <button class="theme-btn" data-theme="system" id="themeSystem"><i class="fas fa-desktop"></i> <span data-i18n="system_mode">Auto</span></button>
+                </div>
+                <button id="langToggleBtn" class="lang-toggle"><i class="fas fa-globe"></i> <span id="langBtnText">中文</span></button>
+            </div>
+        </div>
+
+        <div class="hero">
+            <h1 data-i18n="hero_title">CSS Universe</h1>
+            <p class="hero-sub" data-i18n="hero_desc">Your compass for modern CSS — frameworks, tools, interactive guides & best practices.</p>
+            <div class="hero-meta">
+                <span><i class="fas fa-palette"></i> <span data-i18n="three_modes">3 themes: Light / Dark / System</span></span>
+                <span><i class="fas fa-mobile-alt"></i> <span data-i18n="responsive">Fully responsive</span></span>
+                <span><i class="fas fa-language"></i> <span data-i18n="bilingual">EN / 中文</span></span>
+            </div>
+        </div>
+
+        <div class="cards-grid" id="cardsGrid"></div>
+
+        <footer class="footer">
+            <div class="footer-content">
+                <p data-i18n="footer_copyright">© 2025 CSS.WORLD · Open navigation for the CSS community</p>
+                <div class="footer-links">
+                    <a href="#" id="privacyLink" data-i18n="privacy">Privacy</a>
+                    <span>•</span>
+                    <a href="#" id="contributeLink" data-i18n="contribute">Contribute</a>
+                </div>
+            </div>
+            <div class="theme-badge" data-i18n="system_msg">🌓 Current theme: follow system (you can switch manually)</div>
+        </footer>
+    </div>
+    <div id="toastMsg" class="toast-msg">✅ 主题已切换</div>
+
+    <script>
+        // -------------------- 多语言词库（新增 nav_home）--------------------
+        const translations = {
+            en: {
+                brand: "CSS.WORLD",
+                hero_title: "CSS Universe",
+                hero_desc: "Your compass for modern CSS — frameworks, tools, interactive guides & best practices.",
+                three_modes: "3 themes: Light / Dark / System",
+                responsive: "Fully responsive",
+                bilingual: "EN / 中文",
+                footer_copyright: "© 2025 CSS.WORLD · Open navigation for the CSS community",
+                privacy: "Privacy",
+                contribute: "Contribute",
+                system_msg: "🌓 Theme mode: ",
+                light_mode: "Light",
+                dark_mode: "Dark",
+                system_mode: "Auto",
+                card_btn: "Explore",
+                nav_home: "Home",
+                cards: [
+                    { title: "Tailwind CSS", desc: "Utility-first framework for rapid UI development.", link: "https://tailwindcss.com/" },
+                    { title: "Bootstrap", desc: "World's most popular responsive frontend library.", link: "https://getbootstrap.com/" },
+                    { title: "MDN CSS Docs", desc: "Complete reference, tutorials & latest web standards.", link: "https://developer.mozilla.org/en-US/docs/Web/CSS" },
+                    { title: "CSS Grid Guide", desc: "Master CSS Grid Layout with complete visual guide.", link: "https://css-tricks.com/snippets/css/complete-guide-grid/" },
+                    { title: "Flexbox Froggy", desc: "Learn flexbox interactively with a fun game.", link: "https://flexboxfroggy.com/" },
+                    { title: "Modern CSS", desc: "New features: container queries, :has(), subgrids.", link: "https://web.dev/learn/css" },
+                    { title: "Sass/SCSS", desc: "CSS with superpowers — variables, nesting & mixins.", link: "https://sass-lang.com/" },
+                    { title: "CSS Tools", desc: "Stylelint, Autoprefixer, PurgeCSS & more.", link: "https://stylelint.io/" }
+                ]
+            },
+            zh: {
+                brand: "CSS.WORLD",
+                hero_title: "CSS 宇宙导航",
+                hero_desc: "现代CSS指南针 — 框架、工具、交互教程与最佳实践，一站式导航。",
+                three_modes: "三种主题：明亮 / 暗黑 / 跟随系统",
+                responsive: "全设备响应式",
+                bilingual: "中 / English",
+                footer_copyright: "© 2025 CSS.WORLD · 开放CSS社区导航",
+                privacy: "隐私条款",
+                contribute: "贡献资源",
+                system_msg: "🌓 当前主题模式：",
+                light_mode: "明亮",
+                dark_mode: "暗黑",
+                system_mode: "自动",
+                card_btn: "探索",
+                nav_home: "首页",
+                cards: [
+                    { title: "Tailwind CSS", desc: "实用优先的CSS框架，快速构建现代界面。", link: "https://tailwindcss.com/" },
+                    { title: "Bootstrap", desc: "全球最受欢迎的前端组件库，响应式设计。", link: "https://getbootstrap.com/" },
+                    { title: "MDN CSS 文档", desc: "权威CSS参考、教程与最新Web标准。", link: "https://developer.mozilla.org/zh-CN/docs/Web/CSS" },
+                    { title: "CSS Grid 完全指南", desc: "透彻掌握CSS网格布局，可视化指南。", link: "https://css-tricks.com/snippets/css/complete-guide-grid/" },
+                    { title: "Flexbox 青蛙游戏", desc: "通过趣味游戏学习 Flexbox 布局。", link: "https://flexboxfroggy.com/" },
+                    { title: "现代CSS特性", desc: "容器查询、:has()、subgrid 等新特性。", link: "https://web.dev/learn/css" },
+                    { title: "Sass/SCSS", desc: "拥有变量、嵌套、混入的CSS预处理器。", link: "https://sass-lang.com/" },
+                    { title: "CSS 工具链", desc: "Stylelint, Autoprefixer, PurgeCSS 等。", link: "https://stylelint.io/" }
+                ]
+            }
+        };
+
+        // 当前语言
+        let currentLang = localStorage.getItem('cssworld_lang') || 'en';
+        if (!translations[currentLang]) currentLang = 'en';
+
+        // 当前主题模式: 'light', 'dark', 'system'
+        let currentThemeMode = localStorage.getItem('cssworld_theme') || 'system';
+        
+        // DOM 元素
+        const cardsContainer = document.getElementById('cardsGrid');
+        const themeLightBtn = document.getElementById('themeLight');
+        const themeDarkBtn = document.getElementById('themeDark');
+        const themeSystemBtn = document.getElementById('themeSystem');
+        const langToggleBtn = document.getElementById('langToggleBtn');
+        const langBtnSpan = document.getElementById('langBtnText');
+        const toastMsg = document.getElementById('toastMsg');
+        let toastTimeout;
+
+        // 辅助函数: 显示提示
+        function showToast(message) {
+            if (!toastMsg) return;
+            toastMsg.textContent = message;
+            toastMsg.classList.add('show');
+            if (toastTimeout) clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => toastMsg.classList.remove('show'), 2000);
+        }
+
+        // 核心: 应用主题 (根据 currentThemeMode 和系统监听)
+        let systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+        
+        function applyTheme() {
+            const body = document.body;
+            if (currentThemeMode === 'system') {
+                const isDark = systemPrefersDark.matches;
+                if (isDark) {
+                    body.classList.add('dark');
+                } else {
+                    body.classList.remove('dark');
+                }
+                setActiveThemeButton('system');
+            } else if (currentThemeMode === 'dark') {
+                body.classList.add('dark');
+                setActiveThemeButton('dark');
+            } else { // light
+                body.classList.remove('dark');
+                setActiveThemeButton('light');
+            }
+            localStorage.setItem('cssworld_theme', currentThemeMode);
+            updateThemeBadgeText();
+        }
+
+        function setActiveThemeButton(mode) {
+            [themeLightBtn, themeDarkBtn, themeSystemBtn].forEach(btn => {
+                if (btn) btn.classList.remove('active');
+            });
+            if (mode === 'light' && themeLightBtn) themeLightBtn.classList.add('active');
+            if (mode === 'dark' && themeDarkBtn) themeDarkBtn.classList.add('active');
+            if (mode === 'system' && themeSystemBtn) themeSystemBtn.classList.add('active');
+        }
+
+        function updateThemeBadgeText() {
+            const badgeSpan = document.querySelector('.theme-badge');
+            if (!badgeSpan) return;
+            let modeText = '';
+            if (currentThemeMode === 'light') modeText = (currentLang === 'en' ? 'Light Mode' : '明亮模式');
+            else if (currentThemeMode === 'dark') modeText = (currentLang === 'en' ? 'Dark Mode' : '暗黑模式');
+            else modeText = (currentLang === 'en' ? 'Follow System' : '跟随系统');
+            const base = translations[currentLang]?.system_msg || '🌓 Theme mode: ';
+            badgeSpan.innerText = base + modeText;
+        }
+
+        function handleSystemChange(e) {
+            if (currentThemeMode === 'system') {
+                applyTheme();
+                showToast(currentLang === 'en' ? '🖥️ System theme changed, auto updated' : '🖥️ 系统主题已变化，已自动适配');
+            }
+        }
+        systemPrefersDark.addEventListener('change', handleSystemChange);
+
+        function setTheme(mode) {
+            if (mode !== 'light' && mode !== 'dark' && mode !== 'system') return;
+            currentThemeMode = mode;
+            applyTheme();
+            const msg = currentLang === 'en' 
+                ? (mode === 'light' ? '☀️ Switched to Light mode' : (mode === 'dark' ? '🌙 Switched to Dark mode' : '🖥️ Switched to Follow System'))
+                : (mode === 'light' ? '☀️ 已切换至明亮模式' : (mode === 'dark' ? '🌙 已切换至暗黑模式' : '🖥️ 已切换至跟随系统'));
+            showToast(msg);
+        }
+
+        function renderCards() {
+            if (!cardsContainer) return;
+            const langData = translations[currentLang];
+            const cardsArray = langData.cards;
+            const btnText = langData.card_btn;
+            cardsContainer.innerHTML = '';
+            cardsArray.forEach(card => {
+                let iconHtml = '';
+                const titleLower = card.title.toLowerCase();
+                if (titleLower.includes('tailwind')) iconHtml = '<i class="fab fa-tailwind"></i>';
+                else if (titleLower.includes('bootstrap')) iconHtml = '<i class="fab fa-bootstrap"></i>';
+                else if (titleLower.includes('mdn')) iconHtml = '<i class="fab fa-css3-alt"></i>';
+                else if (titleLower.includes('grid')) iconHtml = '<i class="fas fa-th-large"></i>';
+                else if (titleLower.includes('flexbox')) iconHtml = '<i class="fas fa-arrows-alt"></i>';
+                else if (titleLower.includes('modern')) iconHtml = '<i class="fas fa-waveform"></i>';
+                else if (titleLower.includes('sass')) iconHtml = '<i class="fab fa-sass"></i>';
+                else if (titleLower.includes('tool')) iconHtml = '<i class="fas fa-tools"></i>';
+                else iconHtml = '<i class="fab fa-css3"></i>';
+                
+                const cardDiv = document.createElement('div');
+                cardDiv.className = 'resource-card';
+                cardDiv.innerHTML = `
+                    <div class="card-icon">${iconHtml}</div>
+                    <h3 class="card-title">${escapeHtml(card.title)}</h3>
+                    <p class="card-desc">${escapeHtml(card.desc)}</p>
+                    <a href="${card.link}" class="card-link" target="_blank" rel="noopener noreferrer">
+                        <span>${escapeHtml(btnText)}</span> <i class="fas fa-arrow-right"></i>
+                    </a>
+                `;
+                cardsContainer.appendChild(cardDiv);
+            });
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+
+        function updateStaticTranslations() {
+            const langData = translations[currentLang];
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (langData[key] !== undefined) {
+                    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                        el.placeholder = langData[key];
+                    } else {
+                        el.innerText = langData[key];
+                    }
+                }
+            });
+            const brandSpan = document.querySelector('.brand-name');
+            if (brandSpan) brandSpan.innerText = langData.brand;
+            document.querySelectorAll('.theme-btn span').forEach(span => {
+                const key = span.getAttribute('data-i18n');
+                if (key && langData[key]) span.innerText = langData[key];
+            });
+            if (langBtnSpan) langBtnSpan.innerText = currentLang === 'en' ? '中文' : 'English';
+            updateThemeBadgeText();
+        }
+
+        function setLanguage(lang) {
+            if (!translations[lang]) return;
+            currentLang = lang;
+            localStorage.setItem('cssworld_lang', currentLang);
+            renderCards();
+            updateStaticTranslations();
+            showToast(currentLang === 'en' ? '🌐 Language: English' : '🌐 语言：中文');
+        }
+
+        function toggleLanguage() {
+            const newLang = currentLang === 'en' ? 'zh' : 'en';
+            setLanguage(newLang);
+        }
+
+        function bindFooter() {
+            const privacy = document.getElementById('privacyLink');
+            const contribute = document.getElementById('contributeLink');
+            if (privacy) {
+                privacy.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const msg = currentLang === 'en' ? '🔒 Privacy: static demo, no data collection.' : '🔒 隐私声明：静态演示，不收集数据。';
+                    showToast(msg);
+                });
+            }
+            if (contribute) {
+                contribute.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const msg = currentLang === 'en' ? '✨ Contribute CSS resources via GitHub.' : '✨ 贡献CSS资源请联系开源社区。';
+                    showToast(msg);
+                });
+            }
+            // 导航菜单Home的演示点击提示
+            const homeLink = document.querySelector('.nav-menu a[data-i18n="nav_home"]');
+            if (homeLink) {
+                homeLink.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    showToast(currentLang === 'en' ? '🏠 Home page (ready for your content)' : '🏠 首页（可替换为实际内容）');
+                });
+            }
+        }
+
+        function init() {
+            applyTheme();
+            renderCards();
+            updateStaticTranslations();
+            if (themeLightBtn) themeLightBtn.addEventListener('click', () => setTheme('light'));
+            if (themeDarkBtn) themeDarkBtn.addEventListener('click', () => setTheme('dark'));
+            if (themeSystemBtn) themeSystemBtn.addEventListener('click', () => setTheme('system'));
+            if (langToggleBtn) langToggleBtn.addEventListener('click', toggleLanguage);
+            bindFooter();
+        }
+
+        init();
+    </script>
+</body>
+</html>
