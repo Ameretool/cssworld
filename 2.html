@@ -1,0 +1,812 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>CSS.World · 三模式导航 | 明亮/暗黑/跟随系统</title>
+    <meta name="description" content="全球CSS资源导航 - 支持明亮、暗黑、跟随系统三种主题，中英双语，移动响应式设计。更紧凑的卡片设计，丰富资料分类。">
+    <!-- 字体与图标库 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* 基础主题变量 - 明亮模式 (默认) */
+        :root {
+            --bg-gradient-start: #f8faff;
+            --bg-gradient-end: #eef2fd;
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --card-border: rgba(0, 0, 0, 0.06);
+            --card-shadow: 0 8px 20px -6px rgba(0, 0, 0, 0.06);
+            --text-primary: #1A2C3E;
+            --text-secondary: #2c3e50;
+            --text-muted: #5a6e85;
+            --accent: #2563eb;
+            --accent-glow: rgba(37, 99, 235, 0.2);
+            --header-bg: rgba(255, 255, 255, 0.75);
+            --border-light: #e2e8f0;
+            --hero-bg: linear-gradient(135deg, #f1f5f9 0%, #e6edf8 100%);
+            --footer-bg: rgba(248, 250, 252, 0.7);
+            --badge-bg: #eef2ff;
+            --badge-text: #1e40af;
+            --btn-secondary-bg: rgba(0,0,0,0.05);
+            --theme-selector-bg: rgba(0,0,0,0.03);
+            --nav-link-color: #334155;
+            --nav-link-hover: #1e40af;
+            --card-icon-size: 1.8rem;
+            --card-padding: 1rem;
+        }
+
+        /* 暗黑模式类 (手动或跟随系统时通过js添加dark类) */
+        body.dark {
+            --bg-gradient-start: #0a0e1a;
+            --bg-gradient-end: #03050c;
+            --card-bg: rgba(18, 25, 45, 0.88);
+            --card-border: rgba(72, 187, 255, 0.12);
+            --card-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.5);
+            --text-primary: #F0F3FA;
+            --text-secondary: #CCD9F0;
+            --text-muted: #8fa0bc;
+            --accent: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.25);
+            --header-bg: rgba(10, 16, 30, 0.8);
+            --border-light: #1f2a3e;
+            --hero-bg: linear-gradient(145deg, #101624, #080c18);
+            --footer-bg: rgba(8, 12, 24, 0.7);
+            --badge-bg: #1e293b;
+            --badge-text: #94a3f8;
+            --btn-secondary-bg: rgba(255,255,255,0.08);
+            --theme-selector-bg: #1e293b;
+            --nav-link-color: #cbd5e1;
+            --nav-link-hover: #60a5fa;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: radial-gradient(ellipse at 20% 30%, var(--bg-gradient-start), var(--bg-gradient-end));
+            color: var(--text-primary);
+            line-height: 1.5;
+            min-height: 100vh;
+            transition: background 0.2s ease, color 0.2s;
+        }
+
+        .app-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 1.2rem 1.5rem 2.5rem;
+        }
+
+        /* 导航栏 - 左侧品牌+菜单，右侧控制区 */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            background: var(--header-bg);
+            backdrop-filter: blur(12px);
+            border-radius: 3rem;
+            padding: 0.5rem 1.5rem;
+            margin-bottom: 1.8rem;
+            border: 1px solid var(--card-border);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 1.8rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-weight: 700;
+            font-size: 1.4rem;
+            letter-spacing: -0.3px;
+        }
+
+        .brand-icon {
+            font-size: 1.8rem;
+            color: var(--accent);
+            filter: drop-shadow(0 2px 4px var(--accent-glow));
+        }
+
+        .brand-name {
+            background: linear-gradient(135deg, #2563eb, #38bdf8);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            font-size: 1.4rem;
+        }
+
+        .brand-badge {
+            font-size: 0.65rem;
+            background: var(--badge-bg);
+            color: var(--badge-text);
+            padding: 0.2rem 0.6rem;
+            border-radius: 30px;
+            font-weight: 600;
+        }
+
+        .nav-menu {
+            list-style: none;
+            display: flex;
+            gap: 1.2rem;
+            margin: 0;
+            padding: 0;
+        }
+        .nav-menu li a {
+            text-decoration: none;
+            font-weight: 500;
+            color: var(--nav-link-color);
+            transition: color 0.2s;
+            font-size: 0.9rem;
+        }
+        .nav-menu li a:hover {
+            color: var(--nav-link-hover);
+        }
+
+        .controls {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .theme-selector {
+            display: flex;
+            gap: 0.3rem;
+            background: var(--theme-selector-bg);
+            padding: 0.25rem;
+            border-radius: 2.5rem;
+            backdrop-filter: blur(4px);
+            border: 1px solid var(--card-border);
+        }
+
+        .theme-btn {
+            background: transparent;
+            border: none;
+            padding: 0.35rem 0.8rem;
+            border-radius: 2rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-secondary);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .theme-btn i {
+            font-size: 0.75rem;
+        }
+
+        .theme-btn.active {
+            background: var(--accent);
+            color: white;
+            box-shadow: 0 2px 8px var(--accent-glow);
+        }
+
+        .theme-btn:hover:not(.active) {
+            background: var(--btn-secondary-bg);
+        }
+
+        .lang-toggle {
+            background: transparent;
+            border: 1px solid var(--card-border);
+            padding: 0.35rem 0.9rem;
+            border-radius: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+            font-size: 0.8rem;
+        }
+
+        .lang-toggle:hover {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        /* Hero区域紧凑 */
+        .hero {
+            text-align: center;
+            padding: 1.8rem 1rem 1.5rem;
+            background: var(--hero-bg);
+            border-radius: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--card-border);
+        }
+
+        .hero h1 {
+            font-size: clamp(1.8rem, 6vw, 2.8rem);
+            font-weight: 800;
+            background: linear-gradient(to right, var(--accent), #60a5fa);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+
+        .hero-sub {
+            font-size: 0.95rem;
+            max-width: 580px;
+            margin: 0.6rem auto 0;
+            color: var(--text-muted);
+        }
+
+        .hero-meta {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 1.2rem;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            flex-wrap: wrap;
+        }
+
+        .hero-meta i {
+            margin-right: 0.25rem;
+            color: var(--accent);
+        }
+
+        /* 卡片网格 - 更紧凑的设计，卡片变小 */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 1.2rem;
+            margin: 1.8rem 0 2.5rem;
+        }
+
+        .resource-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(8px);
+            border-radius: 1.5rem;
+            padding: var(--card-padding);
+            border: 1px solid var(--card-border);
+            transition: all 0.25s ease;
+            display: flex;
+            flex-direction: column;
+            box-shadow: var(--card-shadow);
+        }
+
+        .resource-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent);
+            box-shadow: 0 16px 28px -10px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-icon {
+            font-size: var(--card-icon-size);
+            margin-bottom: 0.6rem;
+            color: var(--accent);
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.4rem;
+            letter-spacing: -0.2px;
+        }
+
+        .card-desc {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            line-height: 1.45;
+            margin-bottom: 1.2rem;
+            flex: 1;
+        }
+
+        .card-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-decoration: none;
+            color: var(--accent);
+            border-top: 1px solid var(--border-light);
+            padding-top: 0.7rem;
+            margin-top: 0.2rem;
+            transition: gap 0.2s;
+            width: fit-content;
+        }
+
+        .card-link:hover {
+            gap: 0.8rem;
+        }
+
+        /* 页脚 - 新增邮箱联系样式 */
+        .footer {
+            margin-top: 1.5rem;
+            padding: 1.2rem 0 0.5rem;
+            border-top: 1px solid var(--border-light);
+            background: var(--footer-bg);
+            border-radius: 1.5rem;
+            text-align: center;
+            backdrop-filter: blur(8px);
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            padding: 0 1rem;
+        }
+        .footer-content p {
+            font-size: 0.75rem;
+        }
+        .footer-links {
+            display: flex;
+            gap: 1rem;
+        }
+        .footer-links a, .theme-badge a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.75rem;
+        }
+        .footer-links a:hover {
+            color: var(--accent);
+        }
+        /* 新增邮箱联系行 */
+        .footer-contact {
+            margin-top: 0.6rem;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.4rem;
+            flex-wrap: wrap;
+            border-top: 1px dashed var(--border-light);
+            padding-top: 0.6rem;
+            width: 100%;
+        }
+        .footer-contact i {
+            color: var(--accent);
+            font-size: 0.7rem;
+        }
+        .footer-contact span {
+            font-family: monospace;
+            letter-spacing: 0.5px;
+            background: rgba(128, 128, 128, 0.1);
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+        }
+
+        .theme-badge {
+            margin-top: 0.8rem;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            background: var(--card-bg);
+            display: inline-block;
+            padding: 0.2rem 1rem;
+            border-radius: 2rem;
+            backdrop-filter: blur(4px);
+        }
+
+        @media (max-width: 860px) {
+            .navbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .nav-left {
+                justify-content: space-between;
+                width: 100%;
+            }
+            .controls {
+                justify-content: flex-end;
+            }
+        }
+
+        @media (max-width: 680px) {
+            .app-container {
+                padding: 1rem 1rem 1.5rem;
+            }
+            .nav-left {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+            .nav-menu {
+                flex-wrap: wrap;
+                gap: 0.8rem;
+            }
+            .controls {
+                justify-content: flex-start;
+                margin-top: 0.3rem;
+            }
+            .cards-grid {
+                gap: 1rem;
+                grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            }
+            .resource-card {
+                padding: 0.9rem;
+            }
+            .card-title {
+                font-size: 1.1rem;
+            }
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            .footer-contact {
+                font-size: 0.7rem;
+            }
+        }
+
+        .toast-msg {
+            position: fixed;
+            bottom: 25px;
+            left: 50%;
+            transform: translateX(-50%) scale(0.95);
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--accent);
+            padding: 0.5rem 1.2rem;
+            border-radius: 40px;
+            color: var(--text-primary);
+            font-size: 0.8rem;
+            font-weight: 500;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+            z-index: 1000;
+            white-space: nowrap;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.1);
+        }
+        .toast-msg.show {
+            opacity: 1;
+            transform: translateX(-50%) scale(1);
+        }
+        @media (max-width: 480px) {
+            .toast-msg { white-space: normal; max-width: 85%; text-align: center; font-size: 0.7rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 重构后的导航栏 -->
+        <div class="navbar">
+            <div class="nav-left">
+                <div class="nav-brand">
+                    <i class="fab fa-css3-alt brand-icon"></i>
+                    <span class="brand-name" data-i18n="brand">CSS.WORLD</span>
+                    <span class="brand-badge">+ nav</span>
+                </div>
+                <ul class="nav-menu">
+                    <li><a href="#" data-i18n="nav_home">Home</a></li>
+                </ul>
+            </div>
+            <div class="controls">
+                <div class="theme-selector" id="themeSelector">
+                    <button class="theme-btn" data-theme="light" id="themeLight"><i class="fas fa-sun"></i> <span data-i18n="light_mode">Light</span></button>
+                    <button class="theme-btn" data-theme="dark" id="themeDark"><i class="fas fa-moon"></i> <span data-i18n="dark_mode">Dark</span></button>
+                    <button class="theme-btn" data-theme="system" id="themeSystem"><i class="fas fa-desktop"></i> <span data-i18n="system_mode">Auto</span></button>
+                </div>
+                <button id="langToggleBtn" class="lang-toggle"><i class="fas fa-globe"></i> <span id="langBtnText">中文</span></button>
+            </div>
+        </div>
+
+        <div class="hero">
+            <h1 data-i18n="hero_title">CSS Universe</h1>
+            <p class="hero-sub" data-i18n="hero_desc">Your compass for modern CSS — frameworks, tools, interactive guides & best practices.</p>
+            <div class="hero-meta">
+                <span><i class="fas fa-palette"></i> <span data-i18n="three_modes">3 themes: Light / Dark / System</span></span>
+                <span><i class="fas fa-mobile-alt"></i> <span data-i18n="responsive">Fully responsive</span></span>
+                <span><i class="fas fa-language"></i> <span data-i18n="bilingual">EN / 中文</span></span>
+                <span><i class="fas fa-layer-group"></i> <span data-i18n="card_count">15+ resources</span></span>
+            </div>
+        </div>
+
+        <div class="cards-grid" id="cardsGrid"></div>
+
+        <footer class="footer">
+            <div class="footer-content">
+                <p data-i18n="footer_copyright">© 2025 CSS.WORLD · Open navigation for the CSS community</p>
+                <div class="footer-links">
+                    <a href="#" id="privacyLink" data-i18n="privacy">Privacy</a>
+                    <span>•</span>
+                    <a href="#" id="contributeLink" data-i18n="contribute">Contribute</a>
+                </div>
+            </div>
+            <!-- 新增邮箱联系信息，使用 # 代替 @ -->
+            <div class="footer-contact">
+                <i class="fas fa-envelope"></i>
+                <span>Hello#DomainName.Plus</span>
+                <i class="fas fa-shield-alt" style="opacity:0.6;"></i>
+            </div>
+            <div class="theme-badge" data-i18n="system_msg">🌓 Current theme: follow system (you can switch manually)</div>
+        </footer>
+    </div>
+    <div id="toastMsg" class="toast-msg">✅ 主题已切换</div>
+
+    <script>
+        // -------------------- 多语言词库（大幅度增加卡片数量，分类更细）--------------------
+        const translations = {
+            en: {
+                brand: "CSS.WORLD",
+                hero_title: "CSS Universe",
+                hero_desc: "Your compass for modern CSS — frameworks, tools, interactive guides & best practices.",
+                three_modes: "3 themes: Light / Dark / System",
+                responsive: "Fully responsive",
+                bilingual: "EN / 中文",
+                card_count: "15+ resources",
+                footer_copyright: "© 2025 CSS.WORLD · Open navigation for the CSS community",
+                privacy: "Privacy",
+                contribute: "Contribute",
+                system_msg: "🌓 Theme mode: ",
+                light_mode: "Light",
+                dark_mode: "Dark",
+                system_mode: "Auto",
+                card_btn: "Explore",
+                nav_home: "Home",
+                cards: [
+                    { title: "Tailwind CSS", desc: "Utility-first CSS framework for rapid UI development.", link: "https://tailwindcss.com/", category: "framework" },
+                    { title: "Bootstrap", desc: "World's most popular responsive front-end library.", link: "https://getbootstrap.com/", category: "framework" },
+                    { title: "MDN CSS Docs", desc: "Complete reference, tutorials & latest web standards.", link: "https://developer.mozilla.org/en-US/docs/Web/CSS", category: "docs" },
+                    { title: "CSS Grid Guide", desc: "Complete visual guide to CSS Grid Layout.", link: "https://css-tricks.com/snippets/css/complete-guide-grid/", category: "guide" },
+                    { title: "Flexbox Froggy", desc: "Learn flexbox interactively with a fun game.", link: "https://flexboxfroggy.com/", category: "game" },
+                    { title: "Modern CSS", desc: "New features: container queries, :has(), subgrid.", link: "https://web.dev/learn/css", category: "guide" },
+                    { title: "Sass/SCSS", desc: "CSS with superpowers — variables, nesting & mixins.", link: "https://sass-lang.com/", category: "preprocessor" },
+                    { title: "CSS Tools", desc: "Stylelint, Autoprefixer, PurgeCSS, Lightning CSS.", link: "https://stylelint.io/", category: "tool" },
+                    { title: "PostCSS", desc: "Transform CSS with JavaScript plugins (Autoprefixer, etc).", link: "https://postcss.org/", category: "tool" },
+                    { title: "CSS Modules", desc: "Locally scoped CSS for component-based architectures.", link: "https://github.com/css-modules/css-modules", category: "architecture" },
+                    { title: "Animate.css", desc: "Ready-to-use cross-browser CSS animations.", link: "https://animate.style/", category: "animation" },
+                    { title: "CSS Variables Guide", desc: "Master CSS Custom Properties (variables).", link: "https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_custom_properties", category: "guide" },
+                    { title: "Can I Use", desc: "Browser support tables for modern CSS features.", link: "https://caniuse.com/", category: "tool" },
+                    { title: "Utopia", desc: "Fluid responsive design with CSS clamp() generator.", link: "https://utopia.fyi/", category: "generator" },
+                    { title: "CSS Grid Generator", desc: "Visual grid generator for rapid prototyping.", link: "https://cssgrid-generator.netlify.app/", category: "generator" },
+                    { title: "Smashing CSS", desc: "In-depth articles & techniques from Smashing Magazine.", link: "https://www.smashingmagazine.com/category/css", category: "articles" }
+                ]
+            },
+            zh: {
+                brand: "CSS.WORLD",
+                hero_title: "CSS 宇宙导航",
+                hero_desc: "现代CSS指南针 — 框架、工具、交互教程与最佳实践，一站式导航。",
+                three_modes: "三种主题：明亮 / 暗黑 / 跟随系统",
+                responsive: "全设备响应式",
+                bilingual: "中 / English",
+                card_count: "15+ 资源",
+                footer_copyright: "© 2025 CSS.WORLD · 开放CSS社区导航",
+                privacy: "隐私条款",
+                contribute: "贡献资源",
+                system_msg: "🌓 当前主题模式：",
+                light_mode: "明亮",
+                dark_mode: "暗黑",
+                system_mode: "自动",
+                card_btn: "探索",
+                nav_home: "首页",
+                cards: [
+                    { title: "Tailwind CSS", desc: "实用优先的CSS框架，快速构建现代界面。", link: "https://tailwindcss.com/", category: "framework" },
+                    { title: "Bootstrap", desc: "全球最受欢迎的前端组件库，响应式设计。", link: "https://getbootstrap.com/", category: "framework" },
+                    { title: "MDN CSS 文档", desc: "权威CSS参考、教程与最新Web标准。", link: "https://developer.mozilla.org/zh-CN/docs/Web/CSS", category: "docs" },
+                    { title: "CSS Grid 完全指南", desc: "透彻掌握CSS网格布局，可视化指南。", link: "https://css-tricks.com/snippets/css/complete-guide-grid/", category: "guide" },
+                    { title: "Flexbox 青蛙游戏", desc: "通过趣味游戏学习 Flexbox 布局。", link: "https://flexboxfroggy.com/", category: "game" },
+                    { title: "现代CSS特性", desc: "容器查询、:has()、subgrid 等新特性。", link: "https://web.dev/learn/css", category: "guide" },
+                    { title: "Sass/SCSS", desc: "拥有变量、嵌套、混入的CSS预处理器。", link: "https://sass-lang.com/", category: "preprocessor" },
+                    { title: "CSS 工具链", desc: "Stylelint, Autoprefixer, PurgeCSS, Lightning CSS。", link: "https://stylelint.io/", category: "tool" },
+                    { title: "PostCSS", desc: "通过JS插件转换CSS (Autoprefixer等)。", link: "https://postcss.org/", category: "tool" },
+                    { title: "CSS Modules", desc: "组件化架构中的局部作用域CSS。", link: "https://github.com/css-modules/css-modules", category: "architecture" },
+                    { title: "Animate.css", desc: "即插即用的跨浏览器CSS动画库。", link: "https://animate.style/", category: "animation" },
+                    { title: "CSS 变量指南", desc: "掌握CSS自定义属性（变量）进阶用法。", link: "https://developer.mozilla.org/zh-CN/docs/Web/CSS/Using_CSS_custom_properties", category: "guide" },
+                    { title: "Can I Use", desc: "现代CSS特性的浏览器兼容性查询。", link: "https://caniuse.com/", category: "tool" },
+                    { title: "Utopia", desc: "使用CSS clamp()的流畅响应式设计生成器。", link: "https://utopia.fyi/", category: "generator" },
+                    { title: "CSS Grid 生成器", desc: "可视化网格布局生成器，快速原型。", link: "https://cssgrid-generator.netlify.app/", category: "generator" },
+                    { title: "Smashing CSS", desc: "Smashing Magazine 出品的深度CSS技巧。", link: "https://www.smashingmagazine.com/category/css", category: "articles" }
+                ]
+            }
+        };
+
+        let currentLang = localStorage.getItem('cssworld_lang') || 'en';
+        if (!translations[currentLang]) currentLang = 'en';
+        let currentThemeMode = localStorage.getItem('cssworld_theme') || 'system';
+        
+        const cardsContainer = document.getElementById('cardsGrid');
+        const themeLightBtn = document.getElementById('themeLight');
+        const themeDarkBtn = document.getElementById('themeDark');
+        const themeSystemBtn = document.getElementById('themeSystem');
+        const langToggleBtn = document.getElementById('langToggleBtn');
+        const langBtnSpan = document.getElementById('langBtnText');
+        const toastMsg = document.getElementById('toastMsg');
+        let toastTimeout;
+
+        function showToast(message) {
+            if (!toastMsg) return;
+            toastMsg.textContent = message;
+            toastMsg.classList.add('show');
+            if (toastTimeout) clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => toastMsg.classList.remove('show'), 2000);
+        }
+
+        // 动态图标映射（更丰富，根据标题关键词）
+        function getCardIcon(title) {
+            const t = title.toLowerCase();
+            if (t.includes('tailwind')) return '<i class="fab fa-css3-alt"></i>';
+            if (t.includes('bootstrap')) return '<i class="fab fa-bootstrap"></i>';
+            if (t.includes('mdn')) return '<i class="fab fa-firefox"></i>';
+            if (t.includes('grid')) return '<i class="fas fa-th-large"></i>';
+            if (t.includes('flexbox')) return '<i class="fas fa-arrows-alt"></i>';
+            if (t.includes('modern')) return '<i class="fas fa-waveform"></i>';
+            if (t.includes('sass')) return '<i class="fab fa-sass"></i>';
+            if (t.includes('tool') || t.includes('postcss') || t.includes('stylelint')) return '<i class="fas fa-tools"></i>';
+            if (t.includes('animate')) return '<i class="fas fa-play-circle"></i>';
+            if (t.includes('variable')) return '<i class="fas fa-code-branch"></i>';
+            if (t.includes('can i use')) return '<i class="fas fa-chart-line"></i>';
+            if (t.includes('utopia')) return '<i class="fas fa-ruler-combined"></i>';
+            if (t.includes('generator')) return '<i class="fas fa-sliders-h"></i>';
+            if (t.includes('smashing')) return '<i class="fas fa-newspaper"></i>';
+            if (t.includes('modules')) return '<i class="fas fa-cubes"></i>';
+            return '<i class="fab fa-css3-alt"></i>';
+        }
+
+        function renderCards() {
+            if (!cardsContainer) return;
+            const langData = translations[currentLang];
+            const cardsArray = langData.cards;
+            const btnText = langData.card_btn;
+            cardsContainer.innerHTML = '';
+            cardsArray.forEach(card => {
+                const iconHtml = getCardIcon(card.title);
+                const cardDiv = document.createElement('div');
+                cardDiv.className = 'resource-card';
+                cardDiv.innerHTML = `
+                    <div class="card-icon">${iconHtml}</div>
+                    <h3 class="card-title">${escapeHtml(card.title)}</h3>
+                    <p class="card-desc">${escapeHtml(card.desc)}</p>
+                    <a href="${card.link}" class="card-link" target="_blank" rel="noopener noreferrer">
+                        <span>${escapeHtml(btnText)}</span> <i class="fas fa-arrow-right"></i>
+                    </a>
+                `;
+                cardsContainer.appendChild(cardDiv);
+            });
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+
+        // 主题系统逻辑
+        let systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+        function applyTheme() {
+            const body = document.body;
+            if (currentThemeMode === 'system') {
+                const isDark = systemPrefersDark.matches;
+                if (isDark) body.classList.add('dark');
+                else body.classList.remove('dark');
+                setActiveThemeButton('system');
+            } else if (currentThemeMode === 'dark') {
+                body.classList.add('dark');
+                setActiveThemeButton('dark');
+            } else {
+                body.classList.remove('dark');
+                setActiveThemeButton('light');
+            }
+            localStorage.setItem('cssworld_theme', currentThemeMode);
+            updateThemeBadgeText();
+        }
+
+        function setActiveThemeButton(mode) {
+            [themeLightBtn, themeDarkBtn, themeSystemBtn].forEach(btn => btn?.classList.remove('active'));
+            if (mode === 'light' && themeLightBtn) themeLightBtn.classList.add('active');
+            if (mode === 'dark' && themeDarkBtn) themeDarkBtn.classList.add('active');
+            if (mode === 'system' && themeSystemBtn) themeSystemBtn.classList.add('active');
+        }
+
+        function updateThemeBadgeText() {
+            const badgeSpan = document.querySelector('.theme-badge');
+            if (!badgeSpan) return;
+            let modeText = '';
+            if (currentThemeMode === 'light') modeText = (currentLang === 'en' ? 'Light Mode' : '明亮模式');
+            else if (currentThemeMode === 'dark') modeText = (currentLang === 'en' ? 'Dark Mode' : '暗黑模式');
+            else modeText = (currentLang === 'en' ? 'Follow System' : '跟随系统');
+            const base = translations[currentLang]?.system_msg || '🌓 Theme mode: ';
+            badgeSpan.innerText = base + modeText;
+        }
+
+        function setTheme(mode) {
+            if (!['light', 'dark', 'system'].includes(mode)) return;
+            currentThemeMode = mode;
+            applyTheme();
+            const msg = currentLang === 'en' 
+                ? (mode === 'light' ? '☀️ Light mode' : (mode === 'dark' ? '🌙 Dark mode' : '🖥️ Follow System'))
+                : (mode === 'light' ? '☀️ 明亮模式' : (mode === 'dark' ? '🌙 暗黑模式' : '🖥️ 跟随系统'));
+            showToast(msg);
+        }
+
+        function handleSystemChange(e) {
+            if (currentThemeMode === 'system') {
+                applyTheme();
+                showToast(currentLang === 'en' ? '🖥️ System theme updated' : '🖥️ 系统主题已自动适配');
+            }
+        }
+        systemPrefersDark.addEventListener('change', handleSystemChange);
+
+        function updateStaticTranslations() {
+            const langData = translations[currentLang];
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (langData[key] !== undefined) {
+                    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') el.placeholder = langData[key];
+                    else el.innerText = langData[key];
+                }
+            });
+            const brandSpan = document.querySelector('.brand-name');
+            if (brandSpan) brandSpan.innerText = langData.brand;
+            document.querySelectorAll('.theme-btn span').forEach(span => {
+                const key = span.getAttribute('data-i18n');
+                if (key && langData[key]) span.innerText = langData[key];
+            });
+            if (langBtnSpan) langBtnSpan.innerText = currentLang === 'en' ? '中文' : 'English';
+            updateThemeBadgeText();
+            // 更新Hero meta中的卡片数量显示（基于实际卡片数量）
+            const countSpan = document.querySelector('.hero-meta span:last-child span');
+            if (countSpan && langData.card_count) countSpan.innerText = langData.card_count;
+        }
+
+        function setLanguage(lang) {
+            if (!translations[lang]) return;
+            currentLang = lang;
+            localStorage.setItem('cssworld_lang', currentLang);
+            renderCards();
+            updateStaticTranslations();
+            showToast(currentLang === 'en' ? '🌐 Language: English' : '🌐 语言：中文');
+        }
+
+        function toggleLanguage() {
+            const newLang = currentLang === 'en' ? 'zh' : 'en';
+            setLanguage(newLang);
+        }
+
+        function bindFooter() {
+            const privacy = document.getElementById('privacyLink');
+            const contribute = document.getElementById('contributeLink');
+            privacy?.addEventListener('click', (e) => {
+                e.preventDefault();
+                showToast(currentLang === 'en' ? '🔒 Privacy: static demo, no data collection.' : '🔒 隐私声明：静态演示，不收集数据。');
+            });
+            contribute?.addEventListener('click', (e) => {
+                e.preventDefault();
+                showToast(currentLang === 'en' ? '✨ Contribute CSS resources via GitHub.' : '✨ 贡献CSS资源请联系开源社区。');
+            });
+            const homeLink = document.querySelector('.nav-menu a[data-i18n="nav_home"]');
+            homeLink?.addEventListener('click', (e) => {
+                e.preventDefault();
+                showToast(currentLang === 'en' ? '🏠 Home page (ready for your content)' : '🏠 首页（可替换为实际内容）');
+            });
+        }
+
+        function init() {
+            applyTheme();
+            renderCards();
+            updateStaticTranslations();
+            themeLightBtn?.addEventListener('click', () => setTheme('light'));
+            themeDarkBtn?.addEventListener('click', () => setTheme('dark'));
+            themeSystemBtn?.addEventListener('click', () => setTheme('system'));
+            langToggleBtn?.addEventListener('click', toggleLanguage);
+            bindFooter();
+        }
+        init();
+    </script>
+</body>
+</html>
