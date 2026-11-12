@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CSS World - 纯 CSS 魔法画廊</title>
+  <style>
+    :root {
+      --bg: #09090b; --bg-card: #18181b; --text: #e4e4e7; --text-muted: #a1a1aa;
+      --border: #27272a; --accent: #8b5cf6; --font: 'Inter', system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: var(--font); line-height: 1.6; }
+    
+    /* 顶部导航 */
+    header { text-align: center; padding: 4rem 1rem 2rem; }
+    h1 { font-size: 2.5rem; font-weight: 800; background: linear-gradient(to right, #8b5cf6, #3b82f6); -webkit-background-clip: text; color: transparent; margin-bottom: 0.5rem; }
+    p.subtitle { color: var(--text-muted); font-size: 1rem; }
+
+    /* 瀑布流/网格布局 */
+    .gallery { max-width: 1200px; margin: 0 auto; padding: 2rem; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 2rem; }
+
+    /* 卡片样式 */
+    .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; display: flex; flex-direction: column; }
+    .card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(139, 92, 246, 0.1); border-color: rgba(139, 92, 246, 0.3); }
+    
+    /* 预览区 */
+    .preview-area { height: 200px; display: flex; align-items: center; justify-content: center; background: #000; position: relative; overflow: hidden; }
+    
+    /* 底部信息 */
+    .card-info { padding: 1rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+    .card-title { font-weight: 600; font-size: 1rem; }
+    .copy-btn { background: var(--border); color: var(--text); border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; transition: background 0.2s; }
+    .copy-btn:hover { background: var(--accent); color: white; }
+
+    /* =========================================
+       纯 CSS 魔法 1：霓虹灯发光按钮
+       ========================================= */
+    .magic-btn {
+      padding: 12px 24px; background: transparent; color: #fff; font-weight: bold; font-size: 1rem;
+      border: 2px solid #00f3ff; border-radius: 8px; cursor: pointer; position: relative;
+      text-shadow: 0 0 10px #00f3ff; box-shadow: 0 0 10px #00f3ff, inset 0 0 10px #00f3ff;
+      transition: all 0.3s ease;
+    }
+    .magic-btn:hover { background: #00f3ff; color: #000; box-shadow: 0 0 30px #00f3ff, inset 0 0 20px #00f3ff; text-shadow: none; }
+
+    /* =========================================
+       纯 CSS 魔法 2：3D 悬浮卡片
+       ========================================= */
+    .magic-card-3d {
+      width: 140px; height: 180px; background: linear-gradient(135deg, #FF6B6B, #556270);
+      border-radius: 12px; display: flex; align-items: center; justify-content: center;
+      color: white; font-weight: bold; transition: transform 0.1s;
+      transform-style: preserve-3d; box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+    }
+    .magic-card-3d:hover { transform: rotateX(15deg) rotateY(15deg) scale(1.05); box-shadow: -5px 15px 30px rgba(255, 107, 107, 0.3); }
+
+    /* 移动端适配 */
+    @media (max-width: 768px) { .gallery { grid-template-columns: 1fr; padding: 1rem; } h1 { font-size: 1.8rem; } }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>CSS World</h1>
+    <p class="subtitle">Explore the magic of pure CSS. No JavaScript required.</p>
+  </header>
+
+  <main class="gallery">
+    
+    <!-- 卡片 1：霓虹灯按钮 -->
+    <div class="card">
+      <div class="preview-area">
+        <button class="magic-btn">HOVER ME</button>
+      </div>
+      <div class="card-info">
+        <span class="card-title">霓虹发光按钮</span>
+        <button class="copy-btn" onclick="copyCode('neon-btn')">复制 CSS</button>
+      </div>
+      <!-- 隐藏的代码块，供复制使用 -->
+      <textarea id="neon-btn" style="display:none;">
+.magic-btn {
+  padding: 12px 24px; background: transparent; color: #fff; border: 2px solid #00f3ff; border-radius: 8px; text-shadow: 0 0 10px #00f3ff; box-shadow: 0 0 10px #00f3ff, inset 0 0 10px #00f3ff; transition: all 0.3s ease;
+}
+.magic-btn:hover { background: #00f3ff; color: #000; box-shadow: 0 0 30px #00f3ff; text-shadow: none; }
+      </textarea>
+    </div>
+
+    <!-- 卡片 2：3D 悬浮卡片 -->
+    <div class="card">
+      <div class="preview-area">
+        <div class="magic-card-3d">3D Hover</div>
+      </div>
+      <div class="card-info">
+        <span class="card-title">3D 悬浮卡片</span>
+        <button class="copy-btn" onclick="copyCode('card-3d')">复制 CSS</button>
+      </div>
+      <textarea id="card-3d" style="display:none;">
+.magic-card-3d {
+  width: 140px; height: 180px; background: linear-gradient(135deg, #FF6B6B, #556270); border-radius: 12px; transition: transform 0.1s;
+}
+.magic-card-3d:hover { transform: rotateX(15deg) rotateY(15deg) scale(1.05); box-shadow: -5px 15px 30px rgba(255, 107, 107, 0.3); }
+      </textarea>
+    </div>
+
+  </main>
+
+  <script>
+    // 一键复制功能
+    function copyCode(id) {
+      const code = document.getElementById(id).value.trim();
+      navigator.clipboard.writeText(code).then(() => {
+        const btn = event.target;
+        const originalText = btn.innerText;
+        btn.innerText = "已复制!";
+        btn.style.background = "#10b981"; // 绿色提示
+        setTimeout(() => { btn.innerText = originalText; btn.style.background = ""; }, 2000);
+      });
+    }
+  </script>
+</body>
+</html>
