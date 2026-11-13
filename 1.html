@@ -93,22 +93,10 @@
             pointer-events: none;
         }
 
-        /* 激活状态的 Hover 效果 */
-        .card.active:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-            border-color: var(--accent);
-        }
-
         .icon {
             font-size: 2rem;
             margin-bottom: 1rem;
             filter: grayscale(100%);
-            transition: filter 0.2s ease;
-        }
-
-        .card.active:hover .icon {
-            filter: grayscale(0%);
         }
 
         h2 {
@@ -136,27 +124,10 @@
             color: var(--text-muted);
         }
 
-        .card.active .tag {
-            background-color: #dbeafe;
-            color: #1e40af;
-        }
-
-        @media (prefers-color-scheme: dark) {
-            .card.active .tag {
-                background-color: #1e3a8a;
-                color: #bfdbfe;
-            }
-        }
-
         footer {
             margin-top: 4rem;
             color: var(--text-muted);
             font-size: 0.9rem;
-        }
-        
-        footer a {
-            color: var(--text-muted);
-            text-decoration: underline;
         }
     </style>
 </head>
@@ -191,19 +162,10 @@
             <p class="desc">收集优秀的网页设计案例，拆解背后的 CSS 布局与技巧。</p>
             <span class="tag">规划中 / docs.css.world</span>
         </div>
-
-        <!-- 模块 4：主理人博客（点亮示范） -->
-        <!-- 如果想点亮某个模块，把 class="card disabled" 改成 class="card active"，把 href 加上即可 -->
-        <a href="https://hbw.me" target="_blank" class="card active">
-            <div class="icon">👨‍💻</div>
-            <h2>主理人博客</h2>
-            <p class="desc">记录技术踩坑、图床搭建与日常随笔，追求极简、高速。</p>
-            <span class="tag" style="background-color: var(--card-border); color: var(--text-main);">访问 hbw.me ↗</span>
-        </a>
     </main>
 
     <footer>
-        &copy; 2024 <a href="https://hbw.me" target="_blank">HBW</a>. Powered by Cloudflare Pages.
+        &copy; 2024 CSS World. All rights reserved.
     </footer>
 
 </body>
