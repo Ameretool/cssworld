@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CSS World - 探索 CSS 的无限可能</title>
+    <title>CSS World - Explore the infinite possibilities of CSS</title>
     <style>
+        /* ================= 基础变量与主题 ================= */
         :root {
             --bg-color: #f9fafb;
             --text-main: #111827;
@@ -12,19 +13,20 @@
             --card-bg: #ffffff;
             --card-disabled: #f3f4f6;
             --card-border: #e5e7eb;
-            --accent: #3b82f6;
+            --btn-bg: #ffffff;
+            --btn-border: #e5e7eb;
         }
 
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --bg-color: #111827;
-                --text-main: #f9fafb;
-                --text-muted: #9ca3af;
-                --card-bg: #1f2937;
-                --card-disabled: #1f2937;
-                --card-border: #374151;
-                --accent: #60a5fa;
-            }
+        /* 黑暗模式变量 */
+        .dark {
+            --bg-color: #111827;
+            --text-main: #f9fafb;
+            --text-muted: #9ca3af;
+            --card-bg: #1f2937;
+            --card-disabled: #1f2937;
+            --card-border: #374151;
+            --btn-bg: #1f2937;
+            --btn-border: #374151;
         }
 
         * {
@@ -42,11 +44,43 @@
             align-items: center;
             min-height: 100vh;
             padding: 4rem 1rem;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
+        /* ================= 顶部控制栏 ================= */
+        .controls {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            display: flex;
+            gap: 0.75rem;
+            z-index: 10;
+        }
+
+        button {
+            background-color: var(--btn-bg);
+            border: 1px solid var(--btn-border);
+            color: var(--text-main);
+            padding: 0.5rem 0.75rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        button:hover {
+            border-color: var(--text-muted);
+        }
+
+        /* ================= 内容区域 ================= */
         header {
             text-align: center;
             margin-bottom: 3rem;
+            margin-top: 2rem;
         }
 
         h1 {
@@ -71,21 +105,16 @@
             max-width: 900px;
         }
 
-        /* 卡片通用样式 */
         .card {
             background-color: var(--card-bg);
             border: 1px solid var(--card-border);
             border-radius: 12px;
             padding: 1.5rem;
-            text-decoration: none;
-            color: inherit;
-            transition: all 0.2s ease;
             display: flex;
             flex-direction: column;
             position: relative;
         }
 
-        /* 禁用/置灰状态 */
         .card.disabled {
             background-color: var(--card-disabled);
             opacity: 0.6;
@@ -113,7 +142,6 @@
             flex-grow: 1;
         }
 
-        /* 状态标签 */
         .tag {
             align-self: flex-start;
             padding: 0.25rem 0.75rem;
@@ -129,44 +157,181 @@
             color: var(--text-muted);
             font-size: 0.9rem;
         }
+
+        /* ================= 扩散过渡动画核心 ================= */
+        /* 禁用默认的淡入淡出过渡 */
+        ::view-transition-old(root),
+        ::view-transition-new(root) {
+            animation: none;
+            mix-blend-mode: normal;
+        }
+
+        /* 旧视图在下层 */
+        ::view-transition-old(root) {
+            z-index: 1;
+        }
+
+        /* 新视图在上层，通过 clip-path 动画展开 */
+        ::view-transition-new(root) {
+            z-index: 2;
+            animation: clipExpand 0.6s ease-in-out forwards;
+        }
+
+        /* 如果是切换到黑暗模式，从右上角展开；如果切回亮色，也同理 */
+        @keyframes clipExpand {
+            from {
+                clip-path: circle(0% at 100% 0%); /* 右上角 100% 0% */
+            }
+            to {
+                clip-path: circle(150% at 100% 0%);
+            }
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 600px) {
+            .controls {
+                top: 1rem;
+                right: 1rem;
+            }
+            h1 { font-size: 2rem; }
+        }
     </style>
 </head>
 <body>
 
+    <!-- 右上角控制器 -->
+    <div class="controls">
+        <button id="langToggle" aria-label="Toggle Language">中</button>
+        <button id="themeToggle" aria-label="Toggle Theme">🌙</button>
+    </div>
+
+    <!-- 主内容区 -->
     <header>
         <h1>CSS World</h1>
-        <p class="subtitle">探索、收集与创造最纯粹的 CSS 网页效果。目前正在施工中，敬请期待。</p>
+        <p class="subtitle" data-en="Exploring, collecting, and creating pure CSS web effects. Under construction, coming soon." data-zh="探索、收集与创造最纯粹的 CSS 网页效果。目前正在施工中，敬请期待。">
+            Exploring, collecting, and creating pure CSS web effects. Under construction, coming soon.
+        </p>
     </header>
 
     <main class="grid">
         <!-- 模块 1：动画库 -->
         <div class="card disabled">
             <div class="icon">🎬</div>
-            <h2>CSS 动画库</h2>
-            <p class="desc">自动收录优质的纯 CSS 动画，支持一键复制与实时预览。</p>
-            <span class="tag">规划中 / anim.css.world</span>
+            <h2 data-en="CSS Animation Library" data-zh="CSS 动画库">CSS Animation Library</h2>
+            <p class="desc" data-en="Automatically curating high-quality pure CSS animations with live preview and copy support." data-zh="自动收录优质的纯 CSS 动画，支持一键复制与实时预览。">
+                Automatically curating high-quality pure CSS animations with live preview and copy support.
+            </p>
+            <span class="tag" data-en="Planned / anim.css.world" data-zh="规划中 / anim.css.world">Planned / anim.css.world</span>
         </div>
 
-        <!-- 模块 2：实用生成器 -->
+        <!-- 模块 2：生成器 -->
         <div class="card disabled">
             <div class="icon">🛠️</div>
-            <h2>实用生成器</h2>
-            <p class="desc">可视化配置 box-shadow、渐变、玻璃拟态，直接生成可用代码。</p>
-            <span class="tag">规划中 / tools.css.world</span>
+            <h2 data-en="Generators" data-zh="实用生成器">Generators</h2>
+            <p class="desc" data-en="Visually configure box-shadow, gradients, and glassmorphism. Generate ready-to-use code." data-zh="可视化配置 box-shadow、渐变、玻璃拟态，直接生成可用代码。">
+                Visually configure box-shadow, gradients, and glassmorphism. Generate ready-to-use code.
+            </p>
+            <span class="tag" data-en="Planned / tools.css.world" data-zh="规划中 / tools.css.world">Planned / tools.css.world</span>
         </div>
 
-        <!-- 模块 3：灵感与教程 -->
+        <!-- 模块 3：教程 -->
         <div class="card disabled">
             <div class="icon">💡</div>
-            <h2>灵感与教程</h2>
-            <p class="desc">收集优秀的网页设计案例，拆解背后的 CSS 布局与技巧。</p>
-            <span class="tag">规划中 / docs.css.world</span>
+            <h2 data-en="Inspiration & Docs" data-zh="灵感与教程">Inspiration & Docs</h2>
+            <p class="desc" data-en="Collecting excellent web design cases and breaking down CSS layout techniques." data-zh="收集优秀的网页设计案例，拆解背后的 CSS 布局与技巧。">
+                Collecting excellent web design cases and breaking down CSS layout techniques.
+            </p>
+            <span class="tag" data-en="Planned / docs.css.world" data-zh="规划中 / docs.css.world">Planned / docs.css.world</span>
         </div>
     </main>
 
     <footer>
-        &copy; 2024 CSS World. All rights reserved.
+        &copy; <span id="year"></span> CSS World. All rights reserved.
     </footer>
 
+    <script>
+        // ================= 1. 主题切换逻辑 (带右上角扩散动画) =================
+        const themeToggle = document.getElementById('themeToggle');
+        
+        // 初始化主题
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const savedTheme = localStorage.getItem('theme');
+        
+        if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+            document.documentElement.classList.add('dark');
+            themeToggle.textContent = '☀️';
+        } else {
+            themeToggle.textContent = '🌙';
+        }
+
+        // 切换主题
+        themeToggle.addEventListener('click', () => {
+            const isDark = document.documentElement.classList.contains('dark');
+            const nextTheme = isDark ? 'light' : 'dark';
+
+            // 检查是否支持 View Transitions API
+            if (!document.startViewTransition) {
+                // 不支持则直接切换
+                toggleTheme(nextTheme);
+                return;
+            }
+
+            // 使用 View Transitions 做扩散动画
+            document.startViewTransition(() => {
+                toggleTheme(nextTheme);
+            });
+        });
+
+        function toggleTheme(theme) {
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+                themeToggle.textContent = '☀️';
+            } else {
+                document.documentElement.classList.remove('dark');
+                themeToggle.textContent = '🌙';
+            }
+            localStorage.setItem('theme', theme);
+        }
+
+        // 监听系统主题变化 (仅当用户未手动设置过时)
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+            if (!localStorage.getItem('theme')) {
+                toggleTheme(e.matches ? 'dark' : 'light');
+            }
+        });
+
+
+        // ================= 2. 语言切换逻辑 =================
+        const langToggle = document.getElementById('langToggle');
+        
+        // 默认英文
+        let currentLang = localStorage.getItem('lang') || 'en';
+        
+        function applyLanguage(lang) {
+            document.documentElement.lang = lang;
+            // 遍历所有带有 data-en 和 data-zh 的元素
+            const elements = document.querySelectorAll('[data-en][data-zh]');
+            elements.forEach(el => {
+                el.textContent = el.getAttribute(`data-${lang}`);
+            });
+
+            // 更新按钮文字（如果是英文，按钮显示“中”，反之显示“EN”）
+            langToggle.textContent = lang === 'en' ? '中' : 'EN';
+            localStorage.setItem('lang', lang);
+        }
+
+        // 初始化语言
+        applyLanguage(currentLang);
+
+        // 切换语言
+        langToggle.addEventListener('click', () => {
+            currentLang = currentLang === 'en' ? 'zh' : 'en';
+            applyLanguage(currentLang);
+        });
+
+
+        // ================= 3. 年份动态化 =================
+        document.getElementById('year').textContent = new Date().getFullYear();
+    </script>
 </body>
 </html>
